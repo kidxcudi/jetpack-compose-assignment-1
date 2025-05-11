@@ -72,7 +72,11 @@ fun CourseCard(course: Course) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { isExpanded = !isExpanded },
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary
@@ -137,7 +141,28 @@ fun CourseListScreen(courses: List<Course>) {
 @Composable
 fun CoursePreview() {
     Jetpackcomposeassignment1Theme {
-        val course = Course("Intro to Programming", "CS101", 3, "Learn basics of coding.", "None")
-        CourseCard(course)
+        val courseList = listOf(
+            Course(
+                "Intro to Programming", "CS101", 3,
+                "Learn the basics of coding using modern programming languages. This course introduces variables, conditionals, loops, and functions.",
+                "None"
+            ),
+            Course(
+                "Data Structures", "CS201", 5,
+                "Understand common data structures such as arrays, linked lists, stacks, queues, trees, and hash maps. Emphasis on practical usage and implementation.",
+                "CS101"
+            ),
+            Course(
+                "Algorithms", "CS301", 4,
+                "Learn about algorithm design and analysis, including sorting, searching, recursion, and complexity. Covers greedy, divide and conquer, and dynamic programming techniques.",
+                "CS201"
+            ),
+            Course(
+                "Operating Systems", "CS401", 4,
+                "Explore operating system concepts including process management, memory allocation, file systems, and concurrency. Hands-on with OS simulations.",
+                "CS301"
+            )
+        )
+        CourseListScreen(courses = courseList)
     }
 }

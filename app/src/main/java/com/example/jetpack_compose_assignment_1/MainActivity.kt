@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Jetpackcomposeassignment1Theme {
-
+                CourseListScreen()
             }
         }
     }

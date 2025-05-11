@@ -30,6 +30,11 @@ import androidx.compose.ui.unit.dp
 import com.example.jetpack_compose_assignment_1.ui.theme.Jetpackcomposeassignment1Theme
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons.Filled
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -38,7 +43,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.runtime.remember
 
+data class Course(
+    val title: String,
+    val code: String,
+    val creditHours: Int,
+    val description: String,
+    val prerequisites: String
+)
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,138 +59,77 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Jetpackcomposeassignment1Theme {
-                MyApp(modifier = Modifier.fillMaxSize())
+
             }
         }
     }
 }
 
 @Composable
-fun MyApp(modifier: Modifier = Modifier) {
-    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
+fun CourseCard(course: Course) {
+    var isExpanded = remember { mutableStateOf(false) }
 
-    Surface(modifier) {
-        if (shouldShowOnboarding) {
-            OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
-        } else {
-            Greetings()
-        }
-    }
-}
-
-@Composable
-private fun Greeting(name: String, modifier: Modifier = Modifier) {
     Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { isExpanded.value = !isExpanded.value },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary
-        ),
-        modifier = modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+        )
     ) {
-        CardContent(name)
-    }
-}
-
-@Composable
-private fun CardContent(name: String) {
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-
-    Row(modifier = Modifier
-        .padding(12.dp)
-        .animateContentSize(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
-        )){
-        Column(
-            modifier = Modifier
-            .weight(1f)
-            .padding(12.dp)
-                ) {
-                Text(text = "Hello ")
-                Text(text = name, style = MaterialTheme.typography.headlineMedium.copy(
-                    fontWeight = FontWeight.ExtraBold
-                ))
-
-                if (expanded) {
+        Row(modifier = Modifier.padding(16.dp)){
+            Column(modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
+            ) {
+                Text(text = course.title, style = MaterialTheme.typography.titleLarge)
+                Spacer(modifier = Modifier.height(4.dp))
+                Row {
+                    Text(text = "Code: ${course.code}", style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
-                        text = ("Composem ipsum color sit lazy, " +
-                                "padding theme elit, sed do bouncy. ").repeat(4),
+                        text = "Credits: ${course.creditHours}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                }
+                if (isExpanded.value) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Description: ${course.description}",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Prerequisites: ${course.prerequisites}",
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
+
             }
 
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(
-                imageVector = if (expanded) Filled.KeyboardArrowDown else Filled.KeyboardArrowUp,
-                contentDescription = if (expanded) {
-                    stringResource(R.string.show_less)
-                } else {
-                    stringResource(R.string.show_more)
-                }
-            )
-        }
-        }
-    }
-
-@Composable
-private fun Greetings(
-    modifier: Modifier = Modifier,
-    names: List<String> = List(1000) { "$it" }
-) {
-    LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
-        items(items = names) { name ->
-            Greeting(name = name)
+            IconButton(onClick = { isExpanded.value = !isExpanded.value }) {
+                Icon(
+                    imageVector = if (isExpanded.value) Filled.KeyboardArrowUp else Filled.KeyboardArrowDown,
+                    contentDescription = if (isExpanded.value) {
+                        stringResource(R.string.show_less)
+                    } else {
+                        stringResource(R.string.show_more)
+                    },
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
 
+@Preview(showBackground = true)
 @Composable
-fun OnboardingScreen(modifier: Modifier = Modifier, onContinueClicked: () -> Unit) {
-
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Welcome to the Basics Codelab!")
-        Button(
-            modifier = Modifier.padding(vertical = 24.dp),
-            onClick = onContinueClicked
-        ) {
-            Text("Continue")
-        }
-    }
-}
-
-@Preview
-@Composable
-fun MyAppPreview() {
+fun CoursePreview() {
     Jetpackcomposeassignment1Theme {
-        MyApp(Modifier.fillMaxSize())
+        val course = Course("Intro to Programming", "CS101", 3, "Learn basics of coding.", "None")
+        CourseCard(course)
     }
 }
-
-@Preview(
-    showBackground = true,
-    widthDp = 320,
-    uiMode = UI_MODE_NIGHT_YES,
-    name = "GreetingPreviewDark"
-)
-@Preview(showBackground = true, widthDp = 320)
-@Composable
-fun GreetingPreview() {
-    Jetpackcomposeassignment1Theme {
-        Greetings()
-    }
-}
-
-@Preview(showBackground = true, widthDp = 320, heightDp = 320)
-@Composable
-fun OnboardingPreview() {
-    Jetpackcomposeassignment1Theme {
-        OnboardingScreen(onContinueClicked = {})
-    }
-}
-

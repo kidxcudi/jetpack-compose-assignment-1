@@ -43,7 +43,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.ui.res.stringResource
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.runtime.remember
 
 data class Course(
     val title: String,
@@ -67,13 +66,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun CourseCard(course: Course) {
-    var isExpanded = remember { mutableStateOf(false) }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { isExpanded.value = !isExpanded.value },
+            .clickable { isExpanded = !isExpanded },
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary
@@ -95,7 +94,7 @@ fun CourseCard(course: Course) {
                     )
 
                 }
-                if (isExpanded.value) {
+                if (isExpanded) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Description: ${course.description}",
@@ -110,10 +109,10 @@ fun CourseCard(course: Course) {
 
             }
 
-            IconButton(onClick = { isExpanded.value = !isExpanded.value }) {
+            IconButton(onClick = { isExpanded = !isExpanded }) {
                 Icon(
-                    imageVector = if (isExpanded.value) Filled.KeyboardArrowUp else Filled.KeyboardArrowDown,
-                    contentDescription = if (isExpanded.value) {
+                    imageVector = if (isExpanded) Filled.KeyboardArrowUp else Filled.KeyboardArrowDown,
+                    contentDescription = if (isExpanded) {
                         stringResource(R.string.show_less)
                     } else {
                         stringResource(R.string.show_more)
@@ -121,6 +120,15 @@ fun CourseCard(course: Course) {
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun CourseListScreen(courses: List<Course>) {
+    LazyColumn {
+        items(courses) { course ->
+            CourseCard(course = course)
         }
     }
 }
